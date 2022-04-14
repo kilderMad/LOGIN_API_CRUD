@@ -10,12 +10,13 @@ export default function(state = INITIAL_STATE, action) {
     switch (action.type) {
         case types.LOGIN_SUCCESS:
             {
-                const newState = {...state };
+                console.log('sucesso', {...action.payload})
+                const newState = {...state};
                 newState.isLoggedIn = true;
                 newState.token = action.payload.token;
                 newState.user = action.payload.user;
 
-                return state
+                return newState
             }
 
         case types.LOGIN_FAILED:

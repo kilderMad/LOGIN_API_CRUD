@@ -14,8 +14,8 @@ export default function Loading({ isLoading }){
 
 Loading.defaultProps = {
   isLoading: false,
-}
+};
 
-Loading.PropTypes = {
+Loading.propTypes = {
   isLoading: PropTypes.bool,
 };
