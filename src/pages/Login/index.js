@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { isEmail } from 'validator';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { get } from 'lodash'
 
 import { Container } from '../../styles/globalStyles';
 import { Form } from './styled'
-import axios from '../../services/axios';
-import history from '../../services/history';
 import * as actions from '../../store/modules/auth/actions'
+
+import Loading from '../../components/Loading/Loading';
 
 function Login(props) {
   const dispatch = useDispatch();
 
   const prevPath = get(props, 'location.state.prevPath', '/' );
+
+  const isLoading = useSelector(state => state.auth.isLoading);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,6 +40,7 @@ function Login(props) {
   }
   return (
       <Container>
+        <Loading isLoading={isLoading}/>
         <h1>Login</h1>
 
         <Form onSubmit={handleSumit}>

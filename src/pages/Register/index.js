@@ -1,17 +1,29 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { isEmail } from 'validator';
-import { get } from 'lodash';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { Container } from '../../styles/globalStyles';
 import { Form } from './styled'
-import axios from '../../services/axios';
-import history from '../../services/history';
+import Loading from '../../components/Loading/Loading';
+import * as actions from '../../store/modules/auth/actions'
 
 function Register() {
+  const dispatch = useDispatch();
+  const user = useSelector(state => state.auth.user)
+  const id = useSelector(state => state.auth.user.id)
+  const isLoading = useSelector(state => state.auth.isLoading)
+
   const [email, setEmail] = useState('');
   const [nome, setNome] = useState('');
   const [password, setPassword] = useState('');
+
+  React.useEffect(()=>{
+    if(!user.id) return;
+
+    setNome(user.nome);
+    setEmail(user.email);
+  },[user.email, user.id, user.nome])
 
   async function handleSumit(e) {
     e.preventDefault();
@@ -27,26 +39,19 @@ function Register() {
       formErrors = true
       toast.error('Nome deve ter entre 3 e 255 caracteres')
     }
-    if(password.length < 6 || password.length > 50) {
+    if(!user.id && (password.length < 6 || password.length > 50)) {
       formErrors = true
       toast.error('Senha deve ter entre 6 e 50 caracteres')
     }
 
     if (formErrors) return;
 
-    try {
-      await axios.post('/users/', {nome, password, email});
-      toast.success('Cadastro feito!')
-      history.push('/login')
-    } catch(e) {
-      const errors = get(e, 'response.data.errors', []);
-
-      errors.map(error => toast.error(error))
-    }
+    dispatch(actions.registerRequest({ nome, email, password, id}));
   }
   return (
       <Container>
-        <h1>Register</h1>
+      <Loading isLoading={isLoading}/>
+        <h1>{user.id? 'Editar Usuario': 'Criar sua Conta'}</h1>
 
         <Form onSubmit={handleSumit}>
           <div>
@@ -61,7 +66,7 @@ function Register() {
             <label htmlFor='password'>Senha:</label>
             <input type='password' id='password' onChange={e => setPassword(e.target.value)}/>
           </div>
-          <button type='submit'>Cria Conta</button>
+          <button type='submit'>{user.id? 'Salvar' : 'Cria Conta'}</button>
         </Form>
       </Container>
   );
